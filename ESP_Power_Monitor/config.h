@@ -3,27 +3,37 @@
 	Patryk Sienkiewcz @ WUST W12N, 2023
 */
 
-// WiFi config
-#define NETWORK_SSID	"TP-LINK_55708A"
-#define NETWORK_PASS	"18333633"
+#define ESP32 					// Theoretically defined by IDE but who knows...
 
-// Adafruit IO config
+//*********************	WIFI CONFIG *********************//
+#define NETWORK_SSID	"PATSENPC_NET"
+#define NETWORK_PASS	"patsen95"
+
+//********************* ADAFRUIT IO CONFIG *********************//
 #define AIO_SERVER		"io.adafruit.com"
 #define IO_USERNAME		"Patsen95"
-#define IO_KEY			"aio_dmKD84Z9L7fMDRaVKWfVQV0CuyT2"
+#define IO_KEY 			"aio_QDhb55BOGLUgA3hYximvShgVxuAY"
 
-#define USE_SSL			0
-#define USE_SERIAL		0
+//********************* SYSTEM CONFIG *********************
+#define USE_SERIAL		1		// Debug / logging through default serial
+#define USE_LCD			1
+#define DISPLAY_STATUS	1		// 1 - display status on LCD (if attached)
 
-#if USE_SSL
+#define DAQ_RATE		3000	// Refresh rate in ms
 
-#define Awdwd
 
+//********************* HARDWARE *********************//
+
+#if (USE_LCD == 1)
+// Display GPIO
+#define LCD_MOSI 	19
+#define LCD_SCLK 	18
+#define LCD_CS		5
+#define LCD_DC 		16
+#define LCD_RST 	23
+#define LCD_BL 		4
 #endif
 
-#define DAQ_RATE		3000   // Refresh rate in ms
-
-// Hardware
 // Output relays GPIO
 #define REL_AC
 #define REL_12
@@ -39,4 +49,4 @@
 // Status LED GPIO
 #define STATUS_LED		2
 
-
+#define TEST_BTN		23
