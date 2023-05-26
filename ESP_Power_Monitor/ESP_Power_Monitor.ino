@@ -9,15 +9,18 @@
 
 #include "esp_aio.h"
 
-#include "esp_system.h" // Watchdog functionality
-
+// #include "esp_system.h" // TODO: Watchdog functionality
 
 #include <Adafruit_ST7789.h>
 #include <Adafruit_GFX.h>
 
 
+// Helper macro
 #define TO_VOLTS(val) ((float)(val * (3.3 / 4096)))
 
+
+// ESP's timer handler - needed for updating display independently from MQTT requests
+hw_timer_t *Timer0_Cfg = NULL;
 
 // Setup LCD
 Adafruit_ST7789 tft = Adafruit_ST7789(LCD_CS, LCD_DC, LCD_MOSI, LCD_SCLK, LCD_RST);
@@ -57,12 +60,25 @@ void onRel_33(char *data, uint16_t len);
 
 void DisplayData();
 
+//############################################################################
+// Timer interrupt - refresh display
+void IRAM_ATTR Timer0_ISR()
+{
+	DisplayData();
+}
 
+// ############################################################################
 void setup() 
 {
+	// TODO: Connection status LED
 	// Setup onborad LED (connection status LED)
-	pinMode(STATUS_LED, OUTPUT);
-	digitalWrite(STATUS_LED, LOW);
+	// pinMode(STATUS_LED, OUTPUT);
+	// digitalWrite(STATUS_LED, LOW);
+
+	// Timer configuration
+	Timer0_Cfg = timerBegin(0, 80, true);
+	timerAttachInterrupt(Timer0_Cfg, &Timer0_ISR, true);
+	timerAlarmWrite(Timer0_Cfg, 2000000, true);
 
 	// Setup serial connection
 	Serial.begin(9600);
@@ -87,14 +103,15 @@ void setup()
 	aio.getMQTTClient()->subscribe(sub_Rel5);
 	aio.getMQTTClient()->subscribe(sub_Rel33);
 
-	DisplayData();
+	// TODO: Fix crashing error after enabling the timer
+	// Enable timer
+	// timerAlarmEnable(Timer0_Cfg);
 
 	// Connect to Adafruit IO
 	aio.connect();
 
 	Serial.println();
 	Serial.println(aio.statusString());
-
 }
 
 uint16_t _lastTime = 0;
@@ -102,31 +119,46 @@ uint16_t _endTime = 0;
 
 void loop() 
 {
-	uint16_t _time = millis();
+	// uint16_t _time = millis();
 
 	// We need to ping AIO server (kinda like TTL server pinging)
 	// NOTE: use it only if you are publishing once evry KEEPALIVE seconds (~5 mins)
 	// aio.ping();
 
-	aio.getMQTTClient()->processPackets(1000);
+	// Generate test values with some random numbers
+	s_ac = random(230);
+	s_12 = random(0, 130) / 10.0;
+	s_5 = random(0, 60) / 10.0;
+	s_33 = random(0, 35) / 10.0;
 
-	if(!aio.netConnected())
-	{
-		_endTime = millis();
-		uint16_t _elapsed = _endTime - _lastTime;
-		Serial.println(_elapsed);
-		if (_elapsed >= 3000)
-			esp_restart();
-	}
+	// Send data to AIO
+	pub_SensAC->publish(s_ac);
+	pub_Sens12->publish(s_12);
+	pub_Sens5->publish(s_5);
+	pub_Sens33->publish(s_33);
+
+	// TODO: Auto-reset board after connection lost
+	// if(!aio.netConnected())
+	// {
+	// 	_endTime = millis();
+	// 	uint16_t _elapsed = _endTime - _lastTime;
+	// 	Serial.println(_elapsed);
+	// 	if (_elapsed >= 3000) // ~3s
+	// 		esp_restart();
+	// }
 
 	// Update display
 	DisplayData();
 
+	// Read incoming packets
+	aio.getMQTTClient()->processPackets(1000);
+
 	// Adafruit IO has minimum feed rate limit for publishing data
 	// so some delay is required
-	delay(DAQ_RATE);
+	delay(THROTTLE_DELAY);
 }
 
+// ############################################################################
 void onRel_AC(char *data, uint16_t len)
 {
 	if (rel_ac_state == false)
@@ -232,16 +264,16 @@ void DisplayData()
 
 	canvas.setTextColor(ST77XX_CYAN);
 	canvas.setCursor(70, 140);
-	canvas.print(s_ac);
+	canvas.print(s_ac, 0);
 	canvas.print("V");
 	canvas.setCursor(70, 164);
-	canvas.print(s_12);
+	canvas.print(s_12, 1);
 	canvas.print("V");
 	canvas.setCursor(70, 190);
-	canvas.print(s_5);
+	canvas.print(s_5, 1);
 	canvas.print("V");
 	canvas.setCursor(70, 215);
-	canvas.print(s_33);
+	canvas.print(s_33, 1);
 	canvas.print("V");
 
 	tft.drawRGBBitmap(0, 0, canvas.getBuffer(), canvas.width(), canvas.height());

@@ -61,8 +61,8 @@ typedef Adafruit_MQTT_Subscribe 	AIO_Subscribe;
 // typedef AdafruitIO_Feed 			AIO_Feed;
 // typedef AdafruitIO_Group 			AIO_Group;
 
-///////////////////////////////////////////////////////////////
-// BASE CLASS HANDLING COMMUNICATION
+// ############################################################################
+//  BASE CLASS HANDLING COMMUNICATION
 class ESP_AIO_Client
 {
 public:
@@ -84,7 +84,7 @@ public:
 	AIO_Publish* makePublisher(const char* path);
 	AIO_Subscribe* makeSubscriber(const char* path);
 
-	// TODO
+	// TODO: Implement appropriate classes for simpler Feed & Group handling
 	// AIO_Feed* attachFeed(const char* path);
 	// AIO_Group* attachGroup(const char* path);
 

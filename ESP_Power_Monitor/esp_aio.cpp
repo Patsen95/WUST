@@ -40,14 +40,15 @@ ESP_AIO_Client::~ESP_AIO_Client()
 void ESP_AIO_Client::connect()
 {
 	DPRINT("[CONNECT] ");
+
+	_initNet();
+
 	if(m_isConnected)
 	{
 		DPRINT("Already connected to %s!\n", m_host);
 		return;
 	}
-	if (!m_netEstablished)
-		_initNet();
-	else
+	if(m_netEstablished)
 	{
 		DPRINT("Attempting connect to %s...\n", m_host);
 		uint8_t _attempts = MAX_CONN_ATTEMPTS / 2;
@@ -71,6 +72,8 @@ void ESP_AIO_Client::connect()
 		m_isConnected = true;
 		DPRINT("MQTT connected!\n");
 	}
+	else
+		DPRINT("Can't connect to MQTT - internet connection not established!");
 }
 
 void ESP_AIO_Client::disconnect()
@@ -186,7 +189,7 @@ AIO_Subscribe* ESP_AIO_Client::makeSubscriber(const char *path)
 	return new AIO_Subscribe(m_mqtt_client, m_sub_topic);
 }
 
-// TODO
+// TODO: Implement interface for handling Feed & Group topics
 // AIO_Feed* ESP_AIO_Client::attachFeed(const char *feedName)
 // {
 // 	if(!feedName)
@@ -206,6 +209,9 @@ AIO_Subscribe* ESP_AIO_Client::makeSubscriber(const char *path)
 void ESP_AIO_Client::_initNet()
 {
 	DPRINT("[NET INIT] ");
+	if(m_netEstablished)
+		return;
+	
 	if(strlen(m_ssid) == 0)
 	{
 		m_status = AIO_SSID_INVALID;

@@ -12,18 +12,18 @@
 //********************* ADAFRUIT IO CONFIG *********************//
 #define AIO_SERVER		"io.adafruit.com"
 #define IO_USERNAME		"Patsen95"
-#define IO_KEY 			"aio_QDhb55BOGLUgA3hYximvShgVxuAY"
+#define IO_KEY 			"aio_omqe68wVLExwz3UfvDjBRO0UvHb1"
 
 //********************* SYSTEM CONFIG *********************
 #define USE_SERIAL		1		// Debug / logging through default serial
 #define USE_LCD			1
 #define DISPLAY_STATUS	1		// 1 - display status on LCD (if attached)
 
-#define DAQ_RATE		3000	// Refresh rate in ms
+#define THROTTLE_DELAY	3000	// Minimum delay to satisfy AIO throttle limit.
+								// Should be set accordingly to amount of sent variables.
 
 
 //********************* HARDWARE *********************//
-
 #if (USE_LCD == 1)
 // Display GPIO
 #define LCD_MOSI 	19
@@ -47,6 +47,4 @@
 #define SENS_33			34
 
 // Status LED GPIO
-#define STATUS_LED		2
-
-#define TEST_BTN		23
+// #define STATUS_LED		2
