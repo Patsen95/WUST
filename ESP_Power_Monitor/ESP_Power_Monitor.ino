@@ -2,8 +2,7 @@
 	ESP32 power monitor.
 	Patryk Sienkiewcz @ WUST W12N, 2023
 
-	Check 'Config.h' before upload.
-
+	Check 'Config.h' before upload!
 */
 
 
@@ -120,10 +119,6 @@ uint16_t _endTime = 0;
 void loop() 
 {
 	// uint16_t _time = millis();
-
-	// We need to ping AIO server (kinda like TTL server pinging)
-	// NOTE: use it only if you are publishing once evry KEEPALIVE seconds (~5 mins)
-	// aio.ping();
 
 	// Generate test values with some random numbers
 	s_ac = random(230);

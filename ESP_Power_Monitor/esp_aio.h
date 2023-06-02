@@ -62,7 +62,13 @@ typedef Adafruit_MQTT_Subscribe 	AIO_Subscribe;
 // typedef AdafruitIO_Group 			AIO_Group;
 
 // ############################################################################
-//  BASE CLASS HANDLING COMMUNICATION
+/*!
+	@brief  Class that provides methods for simplest possible interfacing
+			with Adafruit IO protocol.
+			This interface directly supports WiFi connection.
+
+	@warning Check the "config.h" file before attempting the connection.
+*/
 class ESP_AIO_Client
 {
 public:

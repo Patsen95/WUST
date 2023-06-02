@@ -3,7 +3,17 @@
 #include "esp_aio.h"
 
 
-
+/*!
+	@brief	Creates a new instance of an ESP_AIO client class.
+	@param 	*ssid
+			Network SSID string.
+	@param	*pass
+			Password to the network.
+	@param	*user
+			Adafruit IO username.
+	@param	*key
+			Valid Adafruit IO key string. 
+*/
 ESP_AIO_Client::ESP_AIO_Client(const char* ssid, const char* pass, const char* user, const char* key)
 {
 	m_ssid = ssid;
@@ -19,6 +29,9 @@ ESP_AIO_Client::ESP_AIO_Client(const char* ssid, const char* pass, const char* u
 	m_sub_topic = nullptr;
 }
 
+/*!
+	@brief	Class destructor.
+*/
 ESP_AIO_Client::~ESP_AIO_Client()
 {
 	if(m_netEstablished)
@@ -37,6 +50,11 @@ ESP_AIO_Client::~ESP_AIO_Client()
 		free(m_sub_topic);
 }
 
+/*!
+	@brief	Initializes a connection to WiFi and AIO.
+			At first it tries to connect to a WiFi network - there are MAX_CONN_ATTEMPTS attempts.
+			If succeed, it makes MAX_CONN_ATTEMPTS / 2 attempts to connect to AIO.
+*/
 void ESP_AIO_Client::connect()
 {
 	DPRINT("[CONNECT] ");
@@ -76,6 +94,9 @@ void ESP_AIO_Client::connect()
 		DPRINT("Can't connect to MQTT - internet connection not established!");
 }
 
+/*!
+	@brief	Disconnects from AIO and WiFi.
+*/
 void ESP_AIO_Client::disconnect()
 {
 	DPRINT("[DISCONNECT] ");
@@ -94,6 +115,11 @@ void ESP_AIO_Client::disconnect()
 	DPRINT("Disconnected from network!\n");
 }
 
+/*!
+	@brief		Keeps MQTT connection alive by constantly pinging the server.
+	@warning	Use it ONLY if you're sending requests once every KEEPALIVE seconds (~5 mins).
+	@returns	True if server is responding. Otherwise false.
+*/
 bool ESP_AIO_Client::ping()
 {
 	if(m_isConnected)
@@ -109,17 +135,28 @@ bool ESP_AIO_Client::ping()
 	return false;
 }
 
-
+/*!
+	@brief		Returns reference to MQTT client object.
+	@returns	Adafruit_MQTT_Client*
+*/
 Adafruit_MQTT_Client* ESP_AIO_Client::getMQTTClient() const
 {
 	return m_mqtt_client;
 }
 
+/*!
+	@brief		Returns status of network and AIO connection.
+	@returns	aio_status_t or integer
+*/
 aio_status_t ESP_AIO_Client::getStatus() const
 {
 	return m_status;
 }
 
+/*!
+	@brief		Returns string coresponding to actual connection status.
+	@returns	const char*
+*/
 const char* ESP_AIO_Client::statusString() const
 {
 	switch(m_status)
@@ -156,17 +193,31 @@ const char* ESP_AIO_Client::statusString() const
 	}
 }
 
+/*!
+	@brief		Returns WiFi connection status.
+	@returns 	True if connected to WIFi. Otherwise false.
+*/
 bool ESP_AIO_Client::netConnected()
 {
 	m_netEstablished = (_netStatus() != AIO_NET_DISCONNECTED);
 	return m_netEstablished;
 }
 
+/*!
+	@brief		Returns host connection status.
+	@returns 	True if connected to host (AIO). Otherwise false.
+*/
 bool ESP_AIO_Client::hostConnected() const
 {
 	return (bool)(m_status >= AIO_CONNECTED);
 }
 
+/*!
+	@brief		Creates AIO_Publish object that allows to send data to AIO and returns reference to it.
+	@param		*path
+				Path to AIO-side feed topic.
+	@returns	AIO_Publish*
+*/
 AIO_Publish* ESP_AIO_Client::makePublisher(const char *path)
 {
 	if(!path)
@@ -178,6 +229,12 @@ AIO_Publish* ESP_AIO_Client::makePublisher(const char *path)
 	return new AIO_Publish(m_mqtt_client, m_pub_topic);
 }
 
+/*!
+	@brief		Creates AIO_Subscribe object that allows to receive data from AIO and returns reference to it.
+	@param		*path
+				Path to AIO-side feed topic.
+	@returns	AIO_Subscribe*
+*/
 AIO_Subscribe* ESP_AIO_Client::makeSubscriber(const char *path)
 {
 	if(!path)
@@ -206,6 +263,9 @@ AIO_Subscribe* ESP_AIO_Client::makeSubscriber(const char *path)
 // 	return nullptr;
 // }
 
+/*!
+	@brief	[INTERNAL METHOD] Initializes WiFi connection.
+*/
 void ESP_AIO_Client::_initNet()
 {
 	DPRINT("[NET INIT] ");
@@ -247,6 +307,10 @@ void ESP_AIO_Client::_initNet()
 	DPRINT("Status: %s\n", statusString());
 }
 
+/*!
+	@brief		[INTERNAL METHOD] Converts network status (derived from WiFi class) to AIO status.
+	@returns	aio_status_t or int
+*/
 aio_status_t ESP_AIO_Client::_netStatus(wl_status_t net_status)
 {
 	switch(net_status)
