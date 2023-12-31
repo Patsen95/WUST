@@ -1,0 +1,10 @@
+#Folders
+.theia
+.vscode
+__pycache__
+LaserGen/Sim
+LaserGen/Schem
+
+# Files
+DAC
+CODE.c
