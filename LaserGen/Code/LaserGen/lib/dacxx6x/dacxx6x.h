@@ -10,7 +10,7 @@
 *
 *	This library provides methods to easily communicate with these chips through SPI interface.
 *
-*	@author Patryk Sienkiewicz (Patsen95), 2023
+*	@author Patryk Sienkiewicz (@patsen95), 2023
 *
 *	****************************************
 *	The MIT License (MIT)
@@ -36,6 +36,7 @@
 
 #pragma once
 
+
 // Need to distinguish an Arduino API from ESP-IDF framework 
 #ifdef ARDUINO
 #include <Arduino.h>
@@ -45,6 +46,12 @@
 // TODO: ESP-IDF libs
 
 #endif
+
+// Helper types
+typedef signed char 	int8;
+typedef signed short 	int16;
+typedef unsigned char 	uint8;
+typedef unsigned short 	uint16;
 
 
 // Address
@@ -123,18 +130,6 @@ enum VrefCtrl
 #define COMMAND_MASK		0x38
 
 
-
-
-// Helper types
-typedef signed char			int8;
-typedef signed short		int16;
-typedef unsigned char 		uint8;
-typedef unsigned short		uint16;
-
-
-
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -143,7 +138,7 @@ extern "C" {
 	 * Representing an actuall data register format from chip's official documentation.
 	 * Code features special functions dedicated to prepare valid data frame that later is send into DAC.
 	 */
-	typedef struct
+	typedef struct _dataFrame
 	{
 		union
 		{
