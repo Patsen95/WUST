@@ -36,6 +36,9 @@ void WaveGen::init()
 		.waveType = wavetype_t::SINE
 		};
 
+
+	// 
+	
 	for (uint16 i = 0; i < MAX_PHASE_CNT - 1; i++)
 		m_sineOsc.wavetable[i] = MAX_AMPLITUDE + m_sineOsc.amplitude * MAX_AMPLITUDE * sinf(2.0f * M_PI * i / MAX_PHASE_CNT);
 

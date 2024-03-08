@@ -11,6 +11,7 @@
 
 #include "dacxx6x.h"
 #include "util.h"
+#include "cmdparser.h"
 
 
 #define TIMER_DIVIDER 	80
@@ -68,6 +69,7 @@ public:
 	osc_t m_sineOsc;
 private:
 	hw_timer_t *m_timerSine;
+	hw_timer_t *m_timerSaw;
 	dac8162 *m_dac;
 
 	uint16 *m_phaseBuf_sin;
